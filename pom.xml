@@ -177,19 +177,6 @@
                         </configuration>
                     </execution>
 
-                    <!--
-                    <execution>
-                        <id>java-app</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                        <configuration>
-                            <mainClass>com.javarush.zhdanovskikh.Main</mainClass>
-                        </configuration>
-                    </execution>
-                    -->
-
                 </executions>
             </plugin>
 

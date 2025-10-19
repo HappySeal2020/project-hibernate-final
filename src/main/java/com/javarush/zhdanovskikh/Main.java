@@ -67,24 +67,8 @@ public class Main {
         //закроем текущую сессию, чтоб точно делать запрос к БД, а не вытянуть данные из кэша
         main.sessionFactory.getCurrentSession().close();
 
-        //выбираем случайных 10 id городов
-        //так как мы не делали обработку невалидных ситуаций, используй существующие в БД id
-        //List<Integer> ids = List.of(1191, 1828, 248, 1319, 545, 2889, 1815, 3392, 528, 1767);
-        //ids = List.of(1191, 1828, 248, 1319, 545, 2889, 1815, 3392, 528, 1767);
-
         org.openjdk.jmh.Main.main(new String[0]);
-        /*
-        long startRedis = System.currentTimeMillis();
-        main.testRedisData(ids);
-        long stopRedis = System.currentTimeMillis();
 
-        long startMysql = System.currentTimeMillis();
-        main.testMysqlData(ids);
-        long stopMysql = System.currentTimeMillis();
-
-        System.out.printf("%s:\t%d ms\n", "Redis", (stopRedis - startRedis));
-        System.out.printf("%s:\t%d ms\n", "MySQL", (stopMysql - startMysql));
-        */
         main.shutdown();
     }
 
@@ -93,7 +77,6 @@ public class Main {
         Properties properties = new Properties();
         properties.put(Environment.DIALECT, "org.hibernate.dialect.MySQL8Dialect");
         properties.put(Environment.DRIVER, "com.p6spy.engine.spy.P6SpyDriver");
-        //String url = String.format("jdbc:p6spy:mysql://%s:3306/world", HOST);
         properties.put(Environment.URL, String.format("jdbc:p6spy:mysql://%s:3306/world", HOST));
         properties.put(Environment.USER, "root");
         properties.put(Environment.PASS, "root");
@@ -190,14 +173,12 @@ public class Main {
     }
 
     @Benchmark
-    //private void testRedisData(List<Integer> ids, Blackhole bh) {
     public void testRedisData(Blackhole bh) {
         try (StatefulRedisConnection<String, String> connection = redisClient.connect()) {
             RedisStringCommands<String, String> sync = connection.sync();
             for (Integer id : ids) {
                 String value = sync.get(String.valueOf(id));
                 try {
-                    //mapper.readValue(value, CityCountry.class);
                     bh.consume(mapper.readValue(value, CityCountry.class));
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();
@@ -207,7 +188,6 @@ public class Main {
     }
 
     @Benchmark
-    //private void testMysqlData(List<Integer> ids, Blackhole bh) {
     public void testMysqlData(Blackhole bh) {
         try (Session session = sessionFactory.getCurrentSession()) {
             session.beginTransaction();
